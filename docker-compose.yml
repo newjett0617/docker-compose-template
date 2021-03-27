@@ -25,6 +25,8 @@ services:
       - 80:80
     environment:
       - foo=bar
+    volumes:
+      - my-volume:/etc/nginx:rw
     logging:
       driver: json-file
       options:
