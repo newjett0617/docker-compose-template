@@ -1,5 +1,21 @@
 version: "3"
 
+x-basic-setting: &basic-setting
+  init: true
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options:
+      max-size: "2G"
+      max-file: "2"
+      compress: "true"
+  healthcheck:
+    test: [ "CMD-SHELL", "curl --fail http://localhost" ]
+    interval: 30s
+    timeout: 30s
+    start_period: 10s
+    retries: 3
+
 volumes:
   my-volume:
     name: my-volume
@@ -13,10 +29,9 @@ networks:
 
 services:
   my-app:
+    <<: *basic-setting
     image: docker.io/library/nginx:alpine
-    init: true
     container_name: my-app
-    restart: unless-stopped
     networks:
       - my-network
     expose:
@@ -27,15 +42,3 @@ services:
       - foo=bar
     volumes:
       - my-volume:/etc/nginx:rw
-    logging:
-      driver: json-file
-      options:
-        max-size: "200k"
-        max-file: "10"
-        compress: "true"
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
